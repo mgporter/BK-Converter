@@ -36,45 +36,46 @@ class VAR:
         settings.read(settings_file)
     else:
         settings['DEFAULT'] = {
-            'Threshold': '140',
-            'Page Offset': '0',
-            'Processing Boxsize': '60',
-            'Image Sensitivity': '90',
-            'Image Rotation': '0',
-            'Text cropping-Left': '0',
-            'Text cropping-Top': '0',
-            'Text cropping-Right': '0',
-            'Text cropping-Bottom': '0',
-            'Allowable Image Types': 'png; jpg',
-            'Working Directory': os.path.join(os.path.expanduser("~"), "Desktop"),
-            'Path to Tesseract': 'tesseract',
-            'Path to Ghostscript': 'gswin64c',
-            'Last Directory': os.path.join(os.path.expanduser("~"), "Desktop")
+            'threshold': '140',
+            'page offset': '0',
+            'processing boxsize': '60',
+            'image sensitivity': '90',
+            'image rotation': '0',
+            'text cropping-left': '0',
+            'text cropping-top': '0',
+            'text cropping-right': '0',
+            'text cropping-bottom': '0',
+            'allowable image types': 'png; jpg',
+            'working directory': os.path.join(os.path.expanduser("~"), "Desktop"),
+            'path to tesseract': 'tesseract',
+            'path to ghostscript': 'gswin64c',
+            'last directory': os.path.join(os.path.expanduser("~"), "Desktop")
+            'get repository': 'https://github.com/mgporter/BK-Converter.git'
         }
         with open(settings_file, 'w') as f:
             settings.write(f)
 
     setd = settings['DEFAULT']
 
-    thres = setd.getint('Threshold')
-    offset = setd.getint('Page Offset')
-    boxsize = setd.getint('Processing Boxsize')
-    im_sens = setd.getint('Image Sensitivity')
-    rotation = setd.getint('Image Rotation')
-    cropbox = (setd.getint('Text cropping-Left'),
-               setd.getint('Text cropping-Top'),
-               setd.getint('Text cropping-Right'),
-               setd.getint('Text cropping-Bottom'))
-    im_types = parse_image_types(setd['Allowable Image Types'])
+    thres = setd.getint('threshold')
+    offset = setd.getint('page offset')
+    boxsize = setd.getint('processing boxsize')
+    im_sens = setd.getint('image sensitivity')
+    rotation = setd.getint('image rotation')
+    cropbox = (setd.getint('text cropping-left'),
+               setd.getint('text cropping-top'),
+               setd.getint('text cropping-right'),
+               setd.getint('text cropping-bottom'))
+    im_types = parse_image_types(setd['allowable image types'])
     filename = ''
     final_directory = ''
     temp_dir = ''
     dirname_processed = 'BKprocessed'
     dirname_cropped = 'BKcropped'
     dirname_ocr = 'BKocr'
-    temp_base_dir = setd['Working Directory']
-    path_to_tess = setd['Path to Tesseract']
-    path_to_GS = setd['Path to Ghostscript']
+    temp_base_dir = setd['working directory']
+    path_to_tess = setd['path to tesseract']
+    path_to_GS = setd['path to ghostscript']
 
 
 def load_images(progress_callback):
@@ -745,7 +746,7 @@ class Converter(QMainWindow):
                                                      VAR.temp_base_dir, options=options)
         if directory:
             VAR.temp_base_dir = directory
-            VAR.setd['Working Directory'] = directory
+            VAR.setd['working directory'] = directory
             with open(VAR.settings_file, 'w') as f:
                 VAR.settings.write(f)
 
@@ -756,7 +757,7 @@ class Converter(QMainWindow):
                                                   "All Files (*)", options=options)
         if fileName:
             VAR.path_to_tess = fileName
-            VAR.setd['Path to Tesseract'] = fileName
+            VAR.setd['path to tesseract'] = fileName
             with open(VAR.settings_file, 'w') as f:
                 VAR.settings.write(f)
 
@@ -767,7 +768,7 @@ class Converter(QMainWindow):
                                                   "All Files (*)", options=options)
         if fileName:
             VAR.path_to_GS = fileName
-            VAR.setd['Path to Ghostscript'] = fileName
+            VAR.setd['path to ghostscript'] = fileName
             with open(VAR.settings_file, 'w') as f:
                 VAR.settings.write(f)
 
@@ -780,7 +781,7 @@ class Converter(QMainWindow):
         if ok and text != '':
             text = parse_image_types(text)
             VAR.im_types = text
-            VAR.setd['Allowable Image Types'] = "; ".join(map(str, VAR.im_types))
+            VAR.setd['allowable image types'] = "; ".join(map(str, VAR.im_types))
             with open(VAR.settings_file, 'w') as f:
                 VAR.settings.write(f)
 
@@ -1032,8 +1033,8 @@ class Converter(QMainWindow):
     def openpdf(self):
         options = QFileDialog.Options()
 
-        if VAR.setd['Last Directory']:
-            default_folder = VAR.setd['Last Directory']
+        if VAR.setd['last directory']:
+            default_folder = VAR.setd['last directory']
         else:
             default_folder = VAR.temp_base_dir
 
@@ -1052,7 +1053,7 @@ class Converter(QMainWindow):
         dir, file = os.path.split(filename)
         fn, ext = os.path.splitext(file)
 
-        VAR.setd['Last Directory'] = dir
+        VAR.setd['last directory'] = dir
         with open(VAR.settings_file, 'w') as f:
             VAR.settings.write(f)
 
@@ -1082,8 +1083,8 @@ class Converter(QMainWindow):
     def setExistingDirectory(self):
         options = QFileDialog.DontResolveSymlinks | QFileDialog.ShowDirsOnly
 
-        if VAR.setd['Last Directory']:
-            default_folder = VAR.setd['Last Directory']
+        if VAR.setd['last directory']:
+            default_folder = VAR.setd['last directory']
         else:
             default_folder = VAR.temp_base_dir
 
@@ -1096,7 +1097,7 @@ class Converter(QMainWindow):
         self.progress_bar.setHidden(False)
 
         if working_directory:
-            VAR.setd['Last Directory'] = working_directory
+            VAR.setd['last directory'] = working_directory
             with open(VAR.settings_file, 'w') as f:
                 VAR.settings.write(f)
 
