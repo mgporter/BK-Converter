@@ -100,5 +100,5 @@ ENV/
 # mypy
 .mypy_cache/
 
-#
+# This file contains the settings file for each individual computer's setup
 BK_settings.ini
