@@ -16,6 +16,12 @@ from PyQt5.QtCore import (Qt, QObject, pyqtSignal, QRunnable, pyqtSlot, QThreadP
 from PyQt5.QtGui import (QBrush, QColor)
 
 
+
+# If autoopen is set to some directory, that directory will be loaded on startup. Only used for debugging
+autoopen = None
+#autoopen = ""
+
+
 def parse_image_types(text):
     text = regex.sub(r"[^\w;]", "", text)
     text = text.split(";")
@@ -70,24 +76,6 @@ class VAR:
     temp_base_dir = setd['Working Directory']
     path_to_tess = setd['Path to Tesseract']
     path_to_GS = setd['Path to Ghostscript']
-    if sys.platform.startswith("win"):
-        temp_base_dir = os.path.join(os.path.expanduser("~"), "Desktop")
-        path_to_tess = 'C:\\Program Files (x86)\\tesseract4\\tesseract'
-        path_to_GS = "C:\\Program Files\\gs\\gs9.22\\bin\\gswin64c"
-    elif sys.platform.startswith("darwin"):
-        temp_base_dir = os.path.join(os.path.expanduser("~"), "Desktop")
-        path_to_tess = 'tesseract'
-        path_to_GS = '/usr/local/Cellar/ghostscript/9.22/bin/gs'
-
-
-
-
-# If autoopen is set to some directory, that directory will be loaded on startup. Only used for debugging
-autoopen = None
-#autoopen = "C:\\Users\\Michael-Admin\\Desktop\\Book Scanning\\withaccent"
-
-
-
 
 
 def load_images(progress_callback):
@@ -324,10 +312,6 @@ def add_croplines(im, ratio):
 
     im = im.convert("RGB")
     draw = ImageDraw.Draw(im)
-    # boxL = VAR.cropbox[0] if not box[0] else box[0]
-    # boxT = VAR.cropbox[1] if not box[1] else box[1]
-    # boxR = VAR.cropbox[2] if not box[2] else box[2]
-    # boxB = VAR.cropbox[3] if not box[3] else box[3]
 
     fill = (255, 0, 0)
     line_width = 6
@@ -383,12 +367,6 @@ def final_crop(im, pointer=None):
         boxR = VAR.cropbox[2]
         boxB = VAR.cropbox[3]
 
-
-    # box = window.local_adj[window.pointer]["cropbox"]
-    # boxL = VAR.cropbox[0] if not box[0] else box[0]
-    # boxT = VAR.cropbox[1] if not box[1] else box[1]
-    # boxR = VAR.cropbox[2] if not box[2] else box[2]
-    # boxB = VAR.cropbox[3] if not box[3] else box[3]
 
     if boxL >= im.width:
         boxL = im.width - 1
@@ -735,10 +713,6 @@ class Converter(QMainWindow):
         row_process.addWidget(self.ocr_btn)
         row_process.addWidget(self.ocr_pdf_box)
         row_process.addWidget(self.ocr_txt_box)
-
-        # self.temp_btn = QPushButton("test")
-        # self.temp_btn.clicked.connect(self.mkdirectory)
-        # row_process.addWidget(self.temp_btn)
 
         row_process.addWidget(self.processing_label)
         row_process.addStretch()
@@ -1323,7 +1297,7 @@ class Converter(QMainWindow):
 
         local_adj = self.local_adj[self.pointer]
 
-        if self.local_adj[self.pointer]["local"]:
+        if self.local_adj[self.pointer]["local"]:  #Adjust parameters taking into account local values if the "Local" flag is True
             self.this_page_only_check.setChecked(True)
             self.this_page_only_func()
 
@@ -1365,21 +1339,6 @@ class Converter(QMainWindow):
         self.drop_pageR_btn.setChecked(local_adj["dropR"])
         self.drop_pageL_btn.blockSignals(False)
         self.drop_pageR_btn.blockSignals(False)
-
-        # Adjust parameters taking into account local values
-        # self.offset_slider.blockSignals(True)
-        # self.offset_slider.setValue(VAR.offset if not local_adj["offset"] else local_adj["offset"])
-        # self.offset_spinbox.setValue(VAR.offset if not local_adj["offset"] else local_adj["offset"])
-        # self.offset_slider.blockSignals(False)
-
-        # for box in self.cropboxes:
-        #     box.blockSignals(True)
-        # self.cropLbox.setValue(VAR.cropbox[0] if not local_adj["cropbox"][0] else local_adj["cropbox"][0])
-        # self.cropTbox.setValue(VAR.cropbox[1] if not local_adj["cropbox"][1] else local_adj["cropbox"][1])
-        # self.cropRbox.setValue(VAR.cropbox[2] if not local_adj["cropbox"][2] else local_adj["cropbox"][2])
-        # self.cropBbox.setValue(VAR.cropbox[3] if not local_adj["cropbox"][3] else local_adj["cropbox"][3])
-        # for box in self.cropboxes:
-        #     box.blockSignals(False)
 
         # Use the quick preview if scrolling, else use normal view
         if self.viewer_scrollbar.isSliderDown():
@@ -1583,7 +1542,7 @@ def OCRinternals(im, total, src_path, make_pdf, make_txt, progress_callback):
         text = regex.sub(r"\n\n(?=[a-z])", " ", text)  # take out unnecessary double \n
         text = regex.sub(r"(?<!\n)\n(?!\n)", " ", text)  # take out unnecessary single \n
         text = regex.sub(r"“|”", "\"", text)  # replace double quotations
-        text = regex.sub(r"’", "\'", text)  # replace single quotations
+        text = regex.sub(r"‘|’", "\'", text)  # replace single quotations
         text = regex.sub(r"—", "-", text)  # replace dashes
         text = '\n\n' + '>>> ' + f + '\n\n' + text
 
