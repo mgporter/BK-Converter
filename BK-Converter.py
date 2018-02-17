@@ -636,7 +636,8 @@ class Converter(QMainWindow):
                                 self.ocr_txt_box, self.gotopage_box, self.viewer_scrollbar]
         for control in self.bottom_controls:
             control.setEnabled(False)
-        self.name_controls = [self.name_label, self.name_input, self.page_input_label, self.page_input, self.rotate_label, self.rotate_box]
+        self.name_controls = [self.name_label, self.name_input, self.page_input_label, self.page_input, self.rotate_label, self.rotate_box,
+                              self.this_page_only_check, self.this_page_only_reset, self.drop_pageL_btn, self.drop_pageR_btn]
         for control in self.name_controls:
             control.setEnabled(False)
 
