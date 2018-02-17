@@ -17,9 +17,8 @@ from PyQt5.QtGui import (QBrush, QColor)
 
 
 
-# If autoopen is set to some directory, that directory will be loaded on startup. Only used for debugging
+# Only used for debugging. If autoopen is set to some directory, that directory will be loaded on startup, otherwise use None 
 autoopen = None
-#autoopen = ""
 
 
 def parse_image_types(text):
