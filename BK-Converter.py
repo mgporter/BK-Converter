@@ -49,8 +49,8 @@ class VAR:
             'working directory': os.path.join(os.path.expanduser("~"), "Desktop"),
             'path to tesseract': 'tesseract',
             'path to ghostscript': 'gswin64c',
-            'last directory': os.path.join(os.path.expanduser("~"), "Desktop")
-            'get repository': 'https://github.com/mgporter/BK-Converter.git'
+            'last directory': os.path.join(os.path.expanduser("~"), "Desktop"),
+            'github repository': "https://github.com/mgporter/BK-Converter.git"
         }
         with open(settings_file, 'w') as f:
             settings.write(f)
@@ -1541,7 +1541,7 @@ def OCRinternals(im, total, src_path, make_pdf, make_txt, progress_callback):
         text = regex.sub(r"^\n+|\n+$", "", text)  # take out leading and trailing newlines
         text = regex.sub(r"[-—]\n", "", text)  # take out broken words
         text = regex.sub(r"\n\n(?=[a-z])", " ", text)  # take out unnecessary double \n
-        text = regex.sub(r"(?<!\n)\n(?!\n)", " ", text)  # take out unnecessary single \n
+        text = regex.sub(r"(?<!\n)\n(?!(\n|(.\.?[\.\):] )|(\w+: )))", " ", text)  # take out unnecessary single \n
         text = regex.sub(r"“|”", "\"", text)  # replace double quotations
         text = regex.sub(r"‘|’", "\'", text)  # replace single quotations
         text = regex.sub(r"—", "-", text)  # replace dashes
