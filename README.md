@@ -17,3 +17,5 @@ I have an obsession with reading things on my e-book, so BK-Converter (short for
 ## How does it work
 BK-Converter is a PyQt5 interface for Ghostscript (for converting PDFs to images) and Tesseract (for doing OCR on those images). It uses Pillow and NumPy for image processing. The txt output is cleaned up considerably through the use of regex.
 
+## Things to add:
+* Need to add some way to interrupt/pause OCR
