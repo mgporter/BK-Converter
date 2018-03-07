@@ -11,7 +11,7 @@ I have an obsession with reading things on my e-book, so BK-Converter (short for
 * Can crop images (for OCR only)
 * Can control certain parameters separately per-page (for left/right split and cropping only right now)
 * Tesseract OCR - can make a searchable PDF of output and/or txt file
-* Under-the-hood clean-up of OCR output, so that paragraphs are separately properly and superfluous newlines are taken out
+* Under-the-hood clean-up of OCR output, so that paragraphs are separately properly and superfluous newlines are taken out, among other things
 * Multithreaded OCR processing
 
 ## How does it work
