@@ -1,7 +1,7 @@
 # BK-Converter
 
 ## What is it?
-I have an obsession with reading things on my e-book, so BK-Converter (short for "Book Converter") was written to compile a single book-like plain-text file from a PDF or a series of image files.
+I have an obsession with reading things on my e-book, so BK-Converter (short for "Book Converter") was written to compile a single book-like plain text file from a PDF or a series of image files.
 
 ## Features
 * Import PDFs or point BK-Converter to a folder containing image files
