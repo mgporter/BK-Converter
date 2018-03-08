@@ -17,7 +17,8 @@ from PyQt5.QtGui import (QBrush, QColor)
 
 
 
-# Only used for debugging. If autoopen is set to some directory, that directory will be loaded on startup, otherwise use None 
+# Only used for debugging. If autoopen is set to some directory, that directory will be
+# loaded on startup, otherwise use None
 autoopen = None
 
 
@@ -492,10 +493,10 @@ class Converter(QMainWindow):
         self.cropGB.setCheckable(True)
         self.cropGB.setChecked(False)
         cropgrid = QGridLayout()
-        self.cropLbox = QSpinBox()
-        self.cropRbox = QSpinBox()
-        self.cropTbox = QSpinBox()
-        self.cropBbox = QSpinBox()
+        self.cropLbox = MySpinBox()
+        self.cropRbox = MySpinBox()
+        self.cropTbox = MySpinBox()
+        self.cropBbox = MySpinBox()
         self.cropboxes = [self.cropLbox, self.cropRbox, self.cropTbox, self.cropBbox]
         for box in self.cropboxes:
             box.setMinimum(0)
@@ -958,12 +959,30 @@ class Converter(QMainWindow):
                 page["dropR"] = False
                 page["cropbox"] = (0, 0, 0, 0)
                 page["local"] = False
+                page["init"] = True
             self.load_current()
         else:
             pass
 
     def this_page_only_func(self):
+        self.this_page_only_stylesheets(self.this_page_only_check.isChecked())
         if self.this_page_only_check.isChecked():
+            if self.local_adj[self.pointer]["init"] == True:  # the init flag is only True the first time a local adjustment is set
+                self.local_adj[self.pointer]["offset"] = VAR.offset
+                self.local_adj[self.pointer]["cropbox"] = VAR.cropbox
+                self.local_adj[self.pointer]["init"] = False
+            if self.local_adj[self.pointer]["init"] == False:
+                self.local_adj[self.pointer]["local"] = True
+                self.load_current()
+        else:
+            if self.local_adj[self.pointer]["local"] == True:  # the local flag is only True when a local adjustment has actually been made
+                # self.local_adj[self.pointer]["offset"] = 0
+                # self.local_adj[self.pointer]["cropbox"] = (0, 0, 0, 0)
+                self.local_adj[self.pointer]["local"] = False
+                self.load_current()
+
+    def this_page_only_stylesheets(self, setting):
+        if setting:
             self.cropGB.setStyleSheet("QSpinBox {border:1px solid red}")
             self.offset_slider.setStyleSheet("QSlider {border:1px solid red}")
             self.view.setStyleSheet("MyGraphicsView {border:3px solid red}")
@@ -971,11 +990,6 @@ class Converter(QMainWindow):
             self.cropGB.setStyleSheet("QSpinBox {border:1px solid #cccccc}")
             self.offset_slider.setStyleSheet("QSlider {border:1px solid #f0f0f0}")
             self.view.setStyleSheet("MyGraphicsView {border:3px solid #828790}")
-            if self.local_adj[self.pointer]["local"] == True:
-                self.local_adj[self.pointer]["offset"] = 0
-                self.local_adj[self.pointer]["cropbox"] = (0, 0, 0, 0)
-                self.local_adj[self.pointer]["local"] = False
-                self.load_current()
 
     def drop_pageL(self):
         state = self.drop_pageL_btn.isChecked()
@@ -1135,6 +1149,7 @@ class Converter(QMainWindow):
         self.local_adj = {}
         for i in range(self.num_images):
             self.local_adj[i] = {
+                "init": True,
                 "local": False,
                 "dropL": False,
                 "dropR": False,
@@ -1279,7 +1294,7 @@ class Converter(QMainWindow):
             if Lnum > 0:
                 return "Page {:03d}".format(Lnum), "Page {:03d}".format(Rnum)
             elif Lnum == 0 and Rnum + poffset == 1:
-                return "[Not Used]", "Page {0:03d}".format(self.pointer * 2 + 1)
+                return "Page 000", "Page {0:03d}".format(self.pointer * 2 + 1)
             elif Lnum == 0 and Rnum + poffset != 1:
                 return "Preface Page {0:02d}".format(poffset), "Page {0:03d}".format(Rnum)
             elif Lnum < 0:
@@ -1298,46 +1313,45 @@ class Converter(QMainWindow):
 
         local_adj = self.local_adj[self.pointer]
 
-        if self.local_adj[self.pointer]["local"]:  #Adjust parameters taking into account local values if the "Local" flag is True
-            self.this_page_only_check.setChecked(True)
-            self.this_page_only_func()
+        self.this_page_only_check.blockSignals(True)
+        self.offset_slider.blockSignals(True)
+        for box in self.cropboxes:
+            box.blockSignals(True)
+        self.drop_pageL_btn.blockSignals(True)
+        self.drop_pageR_btn.blockSignals(True)
 
-            self.offset_slider.blockSignals(True)
+        if self.local_adj[self.pointer]["local"]:  #Adjust parameters taking into account local values if the "local" flag is True
+
+            self.this_page_only_check.setChecked(True)
+            self.this_page_only_stylesheets(True)
+
             self.offset_slider.setValue(local_adj["offset"])
             self.offset_spinbox.setValue(local_adj["offset"])
-            self.offset_slider.blockSignals(False)
-            
-            for box in self.cropboxes:
-                box.blockSignals(True)
+
             self.cropLbox.setValue(local_adj["cropbox"][0])
             self.cropTbox.setValue(local_adj["cropbox"][1])
             self.cropRbox.setValue(local_adj["cropbox"][2])
             self.cropBbox.setValue(local_adj["cropbox"][3])
-            for box in self.cropboxes:
-                box.blockSignals(False)
 
         else:
             self.this_page_only_check.setChecked(False)
-            self.this_page_only_func()
+            self.this_page_only_stylesheets(False)
 
-            self.offset_slider.blockSignals(True)
             self.offset_slider.setValue(VAR.offset)
             self.offset_spinbox.setValue(VAR.offset)
-            self.offset_slider.blockSignals(False)
 
-            for box in self.cropboxes:
-                box.blockSignals(True)
             self.cropLbox.setValue(VAR.cropbox[0])
             self.cropTbox.setValue(VAR.cropbox[1])
             self.cropRbox.setValue(VAR.cropbox[2])
             self.cropBbox.setValue(VAR.cropbox[3])
-            for box in self.cropboxes:
-                box.blockSignals(False)
 
-        self.drop_pageL_btn.blockSignals(True)
-        self.drop_pageR_btn.blockSignals(True)
         self.drop_pageL_btn.setChecked(local_adj["dropL"])
         self.drop_pageR_btn.setChecked(local_adj["dropR"])
+
+        self.this_page_only_check.blockSignals(False)
+        self.offset_slider.blockSignals(False)
+        for box in self.cropboxes:
+            box.blockSignals(False)
         self.drop_pageL_btn.blockSignals(False)
         self.drop_pageR_btn.blockSignals(False)
 
@@ -1435,6 +1449,17 @@ class MySlider(QSlider):
             super(MySlider, self).mouseMoveEvent(event)
 
 
+class MySpinBox(QSpinBox):
+    def mousePressEvent(self, event):
+        if event.modifiers() & Qt.ControlModifier:
+            if not window.this_page_only_check.isChecked():
+                window.this_page_only_check.setChecked(True)
+                window.this_page_only_func()
+            super(MySpinBox, self).mousePressEvent(event)
+        else:
+            super(MySpinBox, self).mousePressEvent(event)
+
+
 class WorkerSignals(QObject):
     finished = pyqtSignal()
     error = pyqtSignal(tuple)
@@ -1530,7 +1555,10 @@ def OCRinternals(im, total, src_path, make_pdf, make_txt, progress_callback):
     new_file_txt = os.path.join(os.getcwd(), VAR.dirname_ocr, f + '.txt')
 
     if make_pdf:
-        subprocess.call([VAR.path_to_tess, '--oem', '1', old_file, new_file, '-l', 'eng', 'pdf'])
+        # for use with 3.05
+        # subprocess.call([VAR.path_to_tess, '--oem', '1', old_file, new_file, '-l', 'eng', 'pdf'])
+        # for use with 4.00
+        subprocess.call([VAR.path_to_tess, old_file, new_file, '--oem', '1', '-l', 'eng', '-c', 'tessedit_create_pdf=1'])
 
     if make_txt:
         subprocess.call([VAR.path_to_tess, '--oem', '1', old_file_txt, new_file, '-l', 'eng'])
