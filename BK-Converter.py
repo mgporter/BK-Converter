@@ -1570,12 +1570,13 @@ def OCRinternals(im, total, src_path, make_pdf, make_txt, progress_callback):
         text = regex.sub(r"[-—]\n", "", text)  # take out broken words
         text = regex.sub(r"\n\n(?=[a-z])", " ", text)  # take out unnecessary double \n
         text = regex.sub(r"(?<!\n)\n(?!(\n|(.\.?[\.\):] )|(\w+: )))", " ", text)  # take out unnecessary single \n
-        text = regex.sub(r"“|”", "\"", text)  # replace double quotations
-        text = regex.sub(r"‘|’", "\'", text)  # replace single quotations
-        text = regex.sub(r"—", "-", text)  # replace dashes
+        # The following lines are only needed if encoding into UTF-8
+        # text = regex.sub(r"“|”", "\"", text)  # replace double quotations
+        # text = regex.sub(r"‘|’", "\'", text)  # replace single quotations
+        # text = regex.sub(r"—", "-", text)  # replace dashes
         text = '\n\n' + '>>> ' + f + '\n\n' + text
 
-        with open(new_file_txt, 'w', encoding='utf-8') as txtfiletemp:
+        with open(new_file_txt, 'w', encoding='utf-16') as txtfiletemp:
             txtfiletemp.write(text)
 
     counter = window.counter
@@ -1618,13 +1619,13 @@ def mergeOCR(make_pdf, make_txt, name='default'):
         txtfile_list = [os.path.splitext(x)[0] + ".txt" for x in window.final_images]
 
         txtfile_path_final = os.path.join(os.getcwd(), name + '.txt')
-        with open(txtfile_path_final, 'w', encoding='utf-8') as txtfile:
+        with open(txtfile_path_final, 'w', encoding='utf-16') as txtfile:
             txtfile.write('Begin Book\n\n')
 
         for file in txtfile_list:
-            with open(file, 'r', encoding='utf-8') as in_file:
+            with open(file, 'r', encoding='utf-16') as in_file:
                 text = in_file.read()
-            with open(txtfile_path_final, 'a', encoding='utf-8') as txtfile:
+            with open(txtfile_path_final, 'a', encoding='utf-16') as txtfile:
                 txtfile.write(text)
         os.chdir("..")
         try:
