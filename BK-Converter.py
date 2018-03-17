@@ -118,7 +118,7 @@ def load_pdf(input_fn, output_fn, progress_callback):
             "-dBATCH",
             "-dNOPAUSE",
             "-sDEVICE=pnggray",
-            "-r300",
+            "-r600",
             "-sOutputFile=" + output_fn,
             input_fn]
 
